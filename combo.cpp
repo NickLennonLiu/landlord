@@ -27,6 +27,7 @@ bool Combo::biggerSuit(const Combo& b) const{
     return (_catog >= bomb && _catog > b._catog);
 }
 
+
 comboCat Combo::getCat() const {return _catog;}
 
 // 派生类类构造函数
@@ -179,3 +180,8 @@ bool Bomb::greaterThan(const Bomb &b) const
 }
 //Jokers
 // no need to compare
+
+
+Poker Single::getCards() {
+    return card;
+}

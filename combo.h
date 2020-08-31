@@ -23,8 +23,8 @@ single,pair,triple,straight,dstraight,quartwdoub,plane,bomb,jokers
 
 class Combo{
     comboCat _catog;
-    //Poker* _cards;
-    //int _list_len;
+    Poker _cards[21];
+    int _list_len;
     public:
         Combo(comboCat cat);
         Poker* cardList() const;
@@ -33,6 +33,7 @@ class Combo{
         bool canBeCompared(const Combo&) const;
         bool biggerSuit(const Combo&) const;
         comboCat getCat() const;
+        virtual Poker getCards(){return Poker();}
         //virtual bool sameKind(const Combo&) const = 0;
         //virtual bool greaterThan(const Combo&) const = 0;
 };
@@ -43,6 +44,7 @@ class Single : public Combo{
         Single(Poker);
         bool sameKind(const Single&) const;
         bool greaterThan(const Single& b) const;
+        Poker getCards() override;
 };
 
 class Pair : public Combo{

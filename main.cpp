@@ -87,6 +87,7 @@ int main()
     cards[13] = Poker(13,joker);
     cards[14] = Poker(14,joker);
 
+    /*
     Combo* combs[13] = {
         new Single(cards[4]),
         new Single(cards[3]),
@@ -108,7 +109,12 @@ int main()
             std::cout << canBeNext(combs[i],combs[j]) << " ";
         }
         std::cout << std::endl;
-    }
+    }*/
 
+    Single sing(cards[4]);
+    Combo* ptoSing = &sing;
+
+    Poker si = ptoSing->getCards();
+    std::cout << si.getRank();
     return 0;
 }
