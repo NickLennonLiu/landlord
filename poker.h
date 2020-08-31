@@ -30,11 +30,12 @@ class Poker {
     card_rank _rank;
     suit _suit;
 public:
-    Poker() = delete;
+    Poker();
     Poker(card_rank,suit);
     card_rank getRank() const {return _rank;}
     suit getSuit() const {return _suit;}
     bool operator<(const Poker&) const;    
     bool operator==(const Poker&) const;
     bool operator<=(const Poker&) const;
+    bool operator>(const Poker&) const;
 };
