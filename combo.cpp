@@ -110,76 +110,105 @@ Jokers::Jokers()
 // 派生类比较函数
 
 //Single
-bool Single::sameKind(const Single& b) const {
+bool Single::sameKind(const Combo& b) const {
     return true;
 }
 
-bool Single::greaterThan(const Single& b) const {
-    return card > b.card;
+bool Single::greaterThan(const Combo &b) const
+{
+    const Single& b1 = dynamic_cast<const Single&>(b);
+    return card > b1.card;
 }
 //Pair
-bool Pair::sameKind(const Pair& b) const {
+bool Pair::sameKind(const Combo &b) const
+{
     return true;
 }
 
-bool Pair::greaterThan(const Pair&b) const {
-    return card > b.card;
+bool Pair::greaterThan(const Combo &b) const
+{
+    const Pair& b1 = dynamic_cast<const Pair&>(b);
+    return card > b1.card;
 }
 //Triple
-bool Triple::sameKind(const Triple& b) const {
-    return with_num==b.with_num;
+bool Triple::sameKind(const Combo &b) const
+{
+    const Triple &b1 = dynamic_cast<const Triple &>(b);
+    return with_num==b1.with_num;
 }
 
-bool Triple::greaterThan(const Triple& b) const {
-    return card > b.card;
+bool Triple::greaterThan(const Combo &b) const
+{
+    const Triple& b1 = dynamic_cast<const Triple&>(b);
+    return card > b1.card;
 }
 //Straight
-bool Straight::sameKind(const Straight& b) const {
-    return len == b.len;
+bool Straight::sameKind(const Combo &b) const
+{
+    const Straight &b1 = dynamic_cast<const Straight &>(b);
+    return len == b1.len;
 }
 
-bool Straight::greaterThan(const Straight& b) const {
-    return cards[0] > b.cards[0];
+bool Straight::greaterThan(const Combo &b) const
+{
+    const Straight &b1 = dynamic_cast<const Straight &>(b);
+    return cards[0] > b1.cards[0];
 }
 //DStraight
-bool DStraight::sameKind(const DStraight &b) const
+bool DStraight::sameKind(const Combo &b) const
 {
-    return len == b.len;
+    const DStraight &b1 = dynamic_cast<const DStraight &>(b);
+    return len == b1.len;
 }
 
-bool DStraight::greaterThan(const DStraight &b) const
+bool DStraight::greaterThan(const Combo &b) const
 {
-    return cards[0] > b.cards[0];
+    const DStraight& b1 = dynamic_cast<const DStraight&>(b);
+    return cards[0] > b1.cards[0];
 }
 //QuartWDoub
-bool QuartWDoub::sameKind(const QuartWDoub & b) const
+bool QuartWDoub::sameKind(const Combo &b) const
 {
-    return isPair==b.isPair;
+    const QuartWDoub &b1 = dynamic_cast<const QuartWDoub &>(b);
+    return isPair==b1.isPair;
 }
 
-bool QuartWDoub::greaterThan(const QuartWDoub&b) const {
-    return card>b.card;
+bool QuartWDoub::greaterThan(const Combo &b) const
+{
+    const QuartWDoub& b1 = dynamic_cast<const QuartWDoub&>(b);
+    return card>b1.card;
 }
 //Plane
-bool Plane::sameKind(const Plane& b) const {
-    return (len==b.len && isPair==b.isPair);
+bool Plane::sameKind(const Combo &b) const
+{
+    const Plane &b1 = dynamic_cast<const Plane &>(b);
+    return (len==b1.len && isPair==b1.isPair);
 }
 
-bool Plane::greaterThan(const Plane& b) const {
-    return cards[0] > b.cards[0];
+bool Plane::greaterThan(const Combo &b) const
+{
+    const Plane& b1 = dynamic_cast<const Plane&>(b);
+    return cards[0] > b1.cards[0];
 }
 //Bomb
-bool Bomb::sameKind(const Bomb &b) const
+bool Bomb::sameKind(const Combo &b) const
 {
     return true;
 }
 
-bool Bomb::greaterThan(const Bomb &b) const
+bool Bomb::greaterThan(const Combo &b) const
 {
-    return card > b.card;
+    const Bomb& b1 = dynamic_cast<const Bomb&>(b);
+    return card > b1.card;
 }
 //Jokers
-// no need to compare
+bool Jokers::sameKind(const Combo &b) const{
+    return true;
+}
+
+bool Jokers::greaterThan(const Combo &b) const {
+    return false;
+}
 
 
 Poker Single::getCards() {

@@ -28,22 +28,20 @@ class Combo{
     public:
         Combo(comboCat cat);
         Poker* cardList() const;
-        //bool operator==(const Combo&) const;
-        //bool operator<=(const Combo&) const;
         bool canBeCompared(const Combo&) const;
         bool biggerSuit(const Combo&) const;
         comboCat getCat() const;
         virtual Poker getCards(){return Poker();}
-        //virtual bool sameKind(const Combo&) const = 0;
-        //virtual bool greaterThan(const Combo&) const = 0;
+        virtual bool sameKind(const Combo&) const = 0;
+        virtual bool greaterThan(const Combo&) const = 0;
 };
 
 class Single : public Combo{
     Poker card;
     public:
         Single(Poker);
-        bool sameKind(const Single&) const;
-        bool greaterThan(const Single& b) const;
+        bool sameKind(const Combo&) const override;
+        bool greaterThan(const Combo& b) const override;
         Poker getCards() override;
 };
 
@@ -51,8 +49,8 @@ class Pair : public Combo{
     Poker card;
     public:
         Pair(Poker);
-        bool sameKind(const Pair&) const;
-        bool greaterThan(const Pair&) const;
+        bool sameKind(const Combo &) const override;
+        bool greaterThan(const Combo &b) const override;
 };
 
 
@@ -63,8 +61,8 @@ class Triple : public Combo{
     public:
         Triple(Poker tri);
         Triple(Poker tri, int with_num, Poker with);
-        bool sameKind(const Triple&) const;
-        bool greaterThan(const Triple&) const;
+        bool sameKind(const Combo &) const override;
+        bool greaterThan(const Combo &b) const override;
 };
 
 class Straight : public Combo{
@@ -72,8 +70,8 @@ class Straight : public Combo{
     int len;
     public:
         Straight(Poker[],int);
-        bool sameKind(const Straight&) const;
-        bool greaterThan(const Straight&) const;
+        bool sameKind(const Combo &) const override;
+        bool greaterThan(const Combo &b) const override;
 };
 
 class DStraight : public Combo{
@@ -81,8 +79,8 @@ class DStraight : public Combo{
     int len;
     public:
         DStraight(Poker[],int);
-        bool sameKind(const DStraight&) const;
-        bool greaterThan(const DStraight&) const;
+        bool sameKind(const Combo &) const override;
+        bool greaterThan(const Combo &b) const override;
 };
 
 
@@ -92,9 +90,8 @@ class QuartWDoub : public Combo{
     bool isPair;
     public:
         QuartWDoub(Poker,Poker,bool);
-        bool sameKind(const QuartWDoub&) const;
-        bool greaterThan(const QuartWDoub&) const;
-        
+        bool sameKind(const Combo &) const override;
+        bool greaterThan(const Combo &b) const override;
 };
 
 class Plane : public Combo{
@@ -104,19 +101,21 @@ class Plane : public Combo{
     bool isPair;
     public:
         Plane(Poker[],Poker[],int,bool);
-        bool sameKind(const Plane&) const;
-        bool greaterThan(const Plane&) const;
+        bool sameKind(const Combo &) const override;
+        bool greaterThan(const Combo &b) const override;
 };
 
 class Bomb : public Combo{
     Poker card;
     public:
         Bomb(Poker);
-        bool sameKind(const Bomb&) const;
-        bool greaterThan(const Bomb&) const;
+        bool sameKind(const Combo &) const override;
+        bool greaterThan(const Combo &b) const override;
 };
 
 class Jokers : public Combo{
     public:
         Jokers();
+        bool sameKind(const Combo &) const override;
+        bool greaterThan(const Combo &b) const override;
 };
