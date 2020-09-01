@@ -1,4 +1,5 @@
 #pragma once
+#include <QString>
 enum suit{
     diamond,    // 0 
     club,
@@ -32,10 +33,12 @@ class Poker {
 public:
     Poker();
     Poker(card_rank,suit);
+    Poker(QString);
     card_rank getRank() const {return _rank;}
     suit getSuit() const {return _suit;}
     bool operator<(const Poker&) const;    
     bool operator==(const Poker&) const;
     bool operator<=(const Poker&) const;
     bool operator>(const Poker&) const;
+    QString string() const;
 };

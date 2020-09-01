@@ -12,3 +12,7 @@ game::~game()
 {
     delete ui;
 }
+
+void game::getCard(Poker card){
+    hand.append(card);
+}

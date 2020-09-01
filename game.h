@@ -18,6 +18,7 @@ class game : public QWidget
 public:
     explicit game(QWidget *parent = nullptr);
     bool asklord();
+    void getCard(Poker);
     ~game();
 
 private:

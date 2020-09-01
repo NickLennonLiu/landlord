@@ -31,6 +31,9 @@ class lobby : public QMainWindow
 {
     Q_OBJECT
 
+signals:
+    void askforlord();
+
 public slots:
     void acceptConnectionHost();
     void acceptConnectionMedia();
@@ -38,8 +41,12 @@ public slots:
     void on_connect_clicked();
 
     void gameStart();
-    bool whetherLord();
-    void chooseLord(int id);    // A
+
+    void askForLord();      // A 询问谁想抢地主
+    void whosLord();        // A 告知谁是Lord
+
+    bool whetherLord();     // 决定是否叫地主
+    void chooseLord(int id,bool yes);    // A 接收来自 BC的抢地主信息
 
 public:
     lobby(QWidget *parent = nullptr);
@@ -53,9 +60,9 @@ private:
 
     void decideArrange(int a,int b,int c);
     void serve();
-    void askForLord();
 
-    void whosLord();
+
+
     void playStart();
 
     Ui::lobby *ui;
@@ -71,5 +78,6 @@ private:
         play_id,
         lord_id;
     int current_stage;
+    QList<Poker> lordshand;
 };
 #endif // LOBBY_H

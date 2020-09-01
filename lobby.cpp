@@ -57,8 +57,8 @@ void lobby::gameStart(){
 
         serve();
 
-        askForLord();
-        whosLord();
+        QObject::connect(this,SIGNAL(askforlord()),this,SLOT(askForLord()));
+        emit askForLord();
     }
     gamewindow->show();
 }
@@ -72,14 +72,14 @@ void lobby::serve(){
     deck.append(Poker(13,joker));
     deck.append(Poker(14,joker));
     std::random_shuffle(deck.rbegin(),deck.rend());
-    Poker ahand[17],
-          bhand[17],
-          chand[17],
-          lords[3];
-    for(int i = 0;i<17;i++) ahand[i] = deck[i];
-    for(int i = 17;i<34;i++) bhand[i-17] = deck[i];
-    for(int i = 34;i<51;i++) chand[i-34] = deck[i];
-    for(int i = 51;i<54;i++) lords[i-51] = deck[i];
+    QString b_info = "4 1 ";
+    QString c_info = "4 2 ";
+    for(int i = 0;i<17;i++) gamewindow->getCard(deck[i]);
+    for(int i = 17;i<34;i++) b_info += deck[i].string() + " ";
+    for(int i = 34;i<51;i++) c_info += deck[i].string() + " ";
+    for(int i = 51;i<54;i++) lordshand.append(deck[i]);
+    sendMessageByABC(1,c_info);
+    sendMessageByABC(2,c_info);
 }
 
 void lobby::askForLord(){
@@ -94,8 +94,20 @@ void lobby::askForLord(){
     }
 }
 
-void lobby::chooseLord(int id){
-    lord_id = (lord_id < id) ? id : lord_id;
+void lobby::chooseLord(int id,bool yes){
+    lord_id = (lord_id < id && (yes)) ? id : lord_id;
+    if(id==2) {
+        whosLord();
+        playStart();
+    }
+}
+
+void lobby::whosLord(){
+    QString info = "7 ";
+    info += QString::number(lord_id) + " ";
+    for(int i = 0;i<3;i++) info += lordshand[i].string() + " ";
+    sendMessageByABC(1,info);
+    sendMessageByABC(2,info);
 }
 
 bool lobby::whetherLord(){
@@ -107,11 +119,16 @@ bool lobby::whetherLord(){
     } else {
         if(gamewindow->asklord()){
             QString info = "6 ";
-            info += QString::number(play_id);
+            info += QString::number(play_id) + " 1";
             sendMessageByABC(0,info);
             return true;
         }
-        return false;
+        else {
+            QString info = "6 ";
+            info += QString::number(play_id) + " 0";
+            sendMessageByABC(0,info);
+            return false;
+        }
     }
     return false;
 }
