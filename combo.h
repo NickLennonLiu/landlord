@@ -1,23 +1,24 @@
 #pragma once
 #include "poker.h"
+#include <iostream>
 
 /*
-单张    single      1           /
-一对    pair        2           /
-三带    triple      3           带with  none/one/two 0-2
-单顺    straight    5-12        /
-连对    dstraight   2*3-2*10    /      
-四带二  quartwdoub  4           带with  two/pair 2/4
-飞机    plane       3*2-3*6     翼wing single/pair n/2*n
-炸弹    bomb        4
-王炸    jokers
+单张   0 single      1           /
+一对   1 pair        2           /
+三带   2 triple      3           带with  none/one/two 0-2
+单顺   3 straight    5-12        /
+连对   4 dstraight   2*3-2*10    /      
+四带二 5 quartwdoub  4           带with  two/pair 2/4
+飞机   6 plane       3*2-3*6     翼wing single/pair n/2*n
+炸弹   7 bomb        4
+王炸   8 jokers
 */
 
 
 
 
 enum comboCat{
-single,pair,triple,straight,dstraight,quartwdoub,plane,bomb,jokers
+notacombo,single,pair,triple,straight,dstraight,quartwdoub,plane,bomb,jokers
 };
 
 
@@ -32,8 +33,16 @@ class Combo{
         bool biggerSuit(const Combo&) const;
         comboCat getCat() const;
         virtual Poker getCards(){return Poker();}
-        virtual bool sameKind(const Combo&) const = 0;
-        virtual bool greaterThan(const Combo&) const = 0;
+        virtual bool sameKind(const Combo&) const {return false;};
+        virtual bool greaterThan(const Combo&) const {return false;};
+        //friend ostream &operator<<(const ostream &, const Combo &);
+};
+
+std::ostream &operator<<(std::ostream&, const Combo&);
+
+class NotACombo : public Combo{
+    public:
+        NotACombo() : Combo(notacombo) {}
 };
 
 class Single : public Combo{
@@ -86,10 +95,10 @@ class DStraight : public Combo{
 
 class QuartWDoub : public Combo{
     Poker card;
-    Poker doub;
+    Poker doub1, doub2;
     bool isPair;
     public:
-        QuartWDoub(Poker,Poker,bool);
+        QuartWDoub(Poker,Poker,Poker,bool);
         bool sameKind(const Combo &) const override;
         bool greaterThan(const Combo &b) const override;
 };
@@ -98,9 +107,10 @@ class Plane : public Combo{
     Poker cards[6];
     Poker wings[6];
     int len;
-    bool isPair;
+    int with_num;
     public:
-        Plane(Poker[],Poker[],int,bool);
+        Plane(Poker[],int);
+        Plane(Poker[],Poker[],int,int);
         bool sameKind(const Combo &) const override;
         bool greaterThan(const Combo &b) const override;
 };

@@ -5,19 +5,10 @@ Combo::Combo(comboCat cat)
     : _catog(cat)
 {}
 
-/*
-bool Combo::operator==(const Combo& b) const{
-    return _catog == b._catog;
+std::ostream& operator<<(std::ostream& os, const Combo& obj){
+    os << (int)(obj.getCat());
+    return os;
 }
-
-bool Combo::operator<=(const Combo& b) const{
-    if(_catog < b._catog){
-        if(b._catog >= bomb) return true;
-        return false;
-    }
-    return _catog == b._catog;
-}
-*/
 
 bool Combo::canBeCompared(const Combo& b) const{
     return _catog == b._catog;
@@ -70,7 +61,7 @@ Straight::Straight(Poker* list,int len)
 }
 
 DStraight::DStraight(Poker* list,int len)
-    : Combo(straight)
+    : Combo(dstraight)
     , len(len)
 {
     for(int i = 0;i<len;i++){
@@ -78,18 +69,30 @@ DStraight::DStraight(Poker* list,int len)
     }
 }
 
-QuartWDoub::QuartWDoub(Poker card,Poker doub,bool is)
+QuartWDoub::QuartWDoub(Poker card,Poker doub1,Poker doub2,bool is)
     : Combo(quartwdoub)
     , card(card)
-    , doub(doub)
+    , doub1(doub1)
+    , doub2(doub2)
     , isPair(is)
 {
 }
 
-Plane::Plane(Poker* p,Poker* w,int len,bool is)
+Plane::Plane(Poker* p, int len)
     : Combo(plane)
     , len(len)
-    , isPair(is)
+{
+    with_num = 0;
+    for(int i = 0;i<len;i++)
+    {
+        cards[i] = p[i];
+    }
+}
+
+Plane::Plane(Poker* p,Poker* w,int len,int wnum)
+    : Combo(plane)
+    , len(len)
+    , with_num(wnum)
 {
     for(int i = 0;i<len;i++)
     {
@@ -107,6 +110,7 @@ Bomb::Bomb(Poker b)
 Jokers::Jokers()
     : Combo(jokers)
 {}
+
 // 派生类比较函数
 
 //Single
@@ -182,7 +186,7 @@ bool QuartWDoub::greaterThan(const Combo &b) const
 bool Plane::sameKind(const Combo &b) const
 {
     const Plane &b1 = dynamic_cast<const Plane &>(b);
-    return (len==b1.len && isPair==b1.isPair);
+    return (len==b1.len && with_num==b1.with_num);
 }
 
 bool Plane::greaterThan(const Combo &b) const

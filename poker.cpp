@@ -5,6 +5,7 @@ Poker::Poker(){}
 Poker::Poker(card_rank rank,suit suit)
     : _rank(rank), _suit(suit)
     {
+        if(rank>=SMALL_JOKER) _suit = joker;
     }
 
 bool Poker::operator<(const Poker& b) const {
