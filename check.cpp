@@ -13,7 +13,7 @@ bool canBeNext(const Combo &a, const Combo &b)
     return false;
 }
 
-const Combo& whatCombo(Poker* cards, int len){
+Combo& whatCombo(Poker* cards, int len){
     // 排序,是否有必要？
     sort(cards,cards+len);
     

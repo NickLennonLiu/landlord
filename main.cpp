@@ -30,23 +30,15 @@ int main()
           plan[8] = {cards[0], hearts[0], hearts[0], hearts[1], cards[1], cards[1], hearts[2], hearts[3]},
           bom[4] = {cards[0], hearts[0], hearts[0], hearts[0]},
           jok[2] = {cards[13],cards[14]};
-    const Combo& combo = whatCombo(sin,1); cout << combo << endl;
-    const Combo &combo1 = whatCombo(pai, 2);
-    cout << combo1 << endl;
-    const Combo &combo2 = whatCombo(triplewith1, 4);
-    cout << combo2 << endl;
-    const Combo &combo3 = whatCombo(straigh, 5);
-    cout << combo3 << endl;
-    const Combo &combo4 = whatCombo(dstraigh, 6);
-    cout << combo4 << endl;
-    const Combo &combo5 = whatCombo(qwd, 8);
-    cout << combo5 << endl;
-    const Combo &combo6 = whatCombo(plan, 8);
-    cout << combo6 << endl;
-    const Combo &combo7 = whatCombo(bom, 4);
-    cout << combo7 << endl;
-    const Combo &combo8 = whatCombo(jok, 2);
-    cout << combo8 << endl;
+    Combo combo = whatCombo(sin,1); cout << combo << endl;
+    combo = whatCombo(pai, 2); cout << combo << endl;
+    combo = whatCombo(triplewith1, 4); cout << combo << endl;
+    combo = whatCombo(straigh, 5); cout << combo << endl;
+    combo = whatCombo(dstraigh, 6); cout << combo << endl;
+    combo = whatCombo(qwd, 8); cout << combo << endl;
+    combo = whatCombo(plan, 8); cout << combo << endl;
+    combo = whatCombo(bom, 4); cout << combo << endl;
+    combo = whatCombo(jok, 2); cout << combo << endl;
 
     /* Test Comparators
     Combo * combs[13] = {
