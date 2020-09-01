@@ -117,6 +117,7 @@ Combo& whatCombo(Poker* cards, int len){
         if (isContinuous(trips, trip_cnt))
             return *(new Plane(trips, sings, trip_cnt, 1));
     }
+
     // 飞机带双翼
     if ((!sing_cnt) && (pair_cnt==trip_cnt) && (trip_cnt >= 2 && trip_cnt <=6) && (!quart_cnt))
     {
