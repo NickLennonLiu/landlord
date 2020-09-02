@@ -11,6 +11,7 @@
 #include "combo.h"
 #include "check.h"
 #include <algorithm>
+#include <QThread>
 
 #define WAITFORSTART 1
 #define STARTUP 2
@@ -27,12 +28,30 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class lobby; }
 QT_END_NAMESPACE
 
+class LordThread : public QThread
+{
+    Q_OBJECT
+private:
+    int lorddecided;
+protected:
+    void run();
+public:
+    LordThread(QObject *parent=0);
+    ~LordThread();
+signals:
+    void askSignal(int);
+    void playSignal();
+    void lordDecideSignal(int);
+public slots:
+    void lordSlot();
+};
+
 class lobby : public QMainWindow
 {
     Q_OBJECT
 
 signals:
-    void askforlord();
+    void lordProgressSignal();
 
 public slots:
     void acceptConnectionHost();
@@ -42,8 +61,8 @@ public slots:
 
     void gameStart();
 
-    void askForLord();      // A 询问谁想抢地主
-    void whosLord();        // A 告知谁是Lord
+    void askForLord(int);      // A 询问谁想抢地主
+    void whosLord(int);        // A 告知谁是Lord ABC显示谁是LORD，卡牌是什么
 
     bool whetherLord();     // 决定是否叫地主
     void chooseLord(int id,bool yes);    // A 接收来自 BC的抢地主信息
@@ -73,6 +92,7 @@ private:
     QTcpSocket* connectId[3];
     QTcpSocket* connectABC[3];
     QSignalMapper* mapper;
+    LordThread* thread;
     int connection;
     int client_id,
         play_id,
@@ -80,4 +100,7 @@ private:
     int current_stage;
     QList<Poker> lordshand;
 };
+
+
+
 #endif // LOBBY_H

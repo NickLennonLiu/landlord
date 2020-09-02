@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1022</width>
-    <height>590</height>
+    <height>628</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <item>
-        <widget class="QWidget" name="widget" native="true">
+        <widget class="QWidget" name="lord" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
            <horstretch>0</horstretch>
@@ -53,7 +53,7 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
-          <widget class="QWidget" name="widget_4" native="true">
+          <widget class="QWidget" name="upper" native="true">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -67,7 +67,7 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <widget class="QWidget" name="widget_3" native="true">
+          <widget class="QWidget" name="central" native="true">
            <property name="minimumSize">
             <size>
              <width>500</width>
@@ -81,7 +81,7 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <widget class="QWidget" name="widget_2" native="true">
+          <widget class="QWidget" name="lower" native="true">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -91,6 +91,20 @@
           </widget>
          </item>
         </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QPlainTextEdit" name="log">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -110,7 +124,9 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_7">
               <item>
-               <widget class="QWidget" name="widget_6" native="true"/>
+               <widget class="QWidget" name="handArea" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_8"/>
+               </widget>
               </item>
               <item>
                <spacer name="horizontalSpacer">
@@ -133,7 +149,7 @@
                <enum>QLayout::SetDefaultConstraint</enum>
               </property>
               <item>
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="confirm">
                 <property name="maximumSize">
                  <size>
                   <width>100</width>
@@ -141,38 +157,12 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>抢！</string>
+                 <string>出牌</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_3">
-                <property name="maximumSize">
-                 <size>
-                  <width>100</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>不抢！</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_4">
-                <property name="maximumSize">
-                 <size>
-                  <width>100</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>确定</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="pass">
                 <property name="maximumSize">
                  <size>
                   <width>100</width>

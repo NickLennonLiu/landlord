@@ -9,8 +9,10 @@ lobby::lobby(QWidget *parent)
     ui->setupUi(this);
     ui->start->setHidden(true);
     ui->replay->setHidden(true);
+    ui->connect->setDisabled(false);
     setWindowTitle("Game Lobby");
     gamewindow = new game(this);
+    gamewindow->setWindowFlag(Qt::Window);
 }
 
 lobby::~lobby()
@@ -25,6 +27,7 @@ void lobby::acceptConnectionHost() {
         QObject::connect(readWriteSocket_b,SIGNAL(readyRead()),mapper,SLOT(map()));
         mapper->setMapping(readWriteSocket_b,2);
         connectABC[1] = readWriteSocket_b;
+
         connection++;
     }   else {
         readWriteSocket_c = listenSocket->nextPendingConnection();
@@ -38,15 +41,16 @@ void lobby::acceptConnectionHost() {
         playersReady();
         // 启用 开始游戏 按钮
         ui->start->setHidden(false);
-        connect(ui->start,SIGNAL(triggered()),this,SLOT(gameStart()));
+        connect(ui->start,SIGNAL(clicked()),this,SLOT(gameStart()));
     }
 }
 
 void lobby::gameStart(){
     if(client_id==0){
+        //通知BC设置gamewindow
         sendMessageByABC(1,"2");
         sendMessageByABC(2,"2");
-
+        //决定顺序
         qsrand(time(0));
         int idfora = qrand() % 3;
         int idforb = qrand() % 3;
@@ -54,14 +58,47 @@ void lobby::gameStart(){
         int idforc = 0;
         while(idforc == idfora || idforc == idforb) idforc++;
         decideArrange(idfora,idforb,idforc);
-
+        //发牌
         serve();
 
-        QObject::connect(this,SIGNAL(askforlord()),this,SLOT(askForLord()));
-        emit askForLord();
+        thread = new LordThread;
+        connect(thread,SIGNAL(askSignal(int)),this,SLOT(askForLord(int)));
+        connect(this,SIGNAL(lordProgressSignal()),thread,SLOT(lordSlot()));
+        connect(thread,SIGNAL(lordDecideSignal(int)),this,SLOT(whosLord(int)));
+        connect(thread,SIGNAL(playSignal()),this,SLOT(playStart()));
+        thread->start();
     }
     gamewindow->show();
+
 }
+
+void LordThread::run()
+{
+    emit askSignal(0);
+    while(!lorddecided){}
+    qDebug() << "player1 decided!";
+    emit askSignal(1);
+    while(lorddecided==1){}
+    qDebug() << "player2 decided!";
+    emit askSignal(2);
+    while(lorddecided==2){}
+    qDebug() << "player3 decided!";
+    emit lordDecideSignal(0);
+    emit playSignal();
+}
+
+void LordThread::lordSlot(){
+    lorddecided += 1;
+    qDebug() << "lord decided:" << lorddecided ;
+}
+
+LordThread::LordThread(QObject *parent)
+    :QThread(parent)
+{
+    lorddecided = 0;
+}
+
+LordThread::~LordThread(){}
 
 void lobby::serve(){
     QList<Poker> deck;
@@ -78,36 +115,44 @@ void lobby::serve(){
     for(int i = 17;i<34;i++) b_info += deck[i].string() + " ";
     for(int i = 34;i<51;i++) c_info += deck[i].string() + " ";
     for(int i = 51;i<54;i++) lordshand.append(deck[i]);
-    sendMessageByABC(1,c_info);
+    sendMessageByABC(1,b_info);
     sendMessageByABC(2,c_info);
+    gamewindow->showCard();
 }
 
-void lobby::askForLord(){
-    for(int i = 0;i<3;i++){
-        if(i==play_id){
-            if(whetherLord()) lord_id = i;
-        } else {
-            QString info = "5 ";
-            info += QString::number(i);
-            sendMessageById(i,info);
-        }
+// A发出 询问是否抢地主
+void lobby::askForLord(int i){
+    if(i==play_id){
+        if(whetherLord()) lord_id = i;
+        emit lordProgressSignal();
+    } else {
+        QString info = "5 ";
+        info += QString::number(i);
+        sendMessageById(i,info);
     }
 }
 
-void lobby::chooseLord(int id,bool yes){
+// B和C决定谁是地主
+void lobby::chooseLord(int id,bool yes)
+{
     lord_id = (lord_id < id && (yes)) ? id : lord_id;
-    if(id==2) {
-        whosLord();
-        playStart();
-    }
+    emit lordProgressSignal();
 }
 
-void lobby::whosLord(){
-    QString info = "7 ";
-    info += QString::number(lord_id) + " ";
-    for(int i = 0;i<3;i++) info += lordshand[i].string() + " ";
-    sendMessageByABC(1,info);
-    sendMessageByABC(2,info);
+// 地主是谁，卡牌是什么，瞬时完成
+void lobby::whosLord(int lordid){
+    qDebug() << "The lord has been decided! " << lordid;
+
+    if(client_id==0){
+        lordid = lord_id;
+        QString info = "7 ";
+        info += QString::number(lord_id) + " ";
+        for(int i = 0;i<3;i++) info += lordshand[i].string() + " ";
+        sendMessageByABC(1,info);
+        sendMessageByABC(2,info);
+    }
+    lord_id = lordid;
+    gamewindow->showlord(lord_id);
 }
 
 bool lobby::whetherLord(){
@@ -121,12 +166,14 @@ bool lobby::whetherLord(){
             QString info = "6 ";
             info += QString::number(play_id) + " 1";
             sendMessageByABC(0,info);
+            qDebug() << "I'm deciding: " << info;
             return true;
         }
         else {
             QString info = "6 ";
             info += QString::number(play_id) + " 0";
             sendMessageByABC(0,info);
+            qDebug() << "I'm deciding: " << info;
             return false;
         }
     }
@@ -139,7 +186,6 @@ void lobby::decideArrange(int a, int b, int c){
     connectId[c] = connectABC[2];
     if(!client_id){
         play_id = a;
-
         QString info = "3 ";
         info += QString::number(a) + " ";
         info += QString::number(b) + " ";
@@ -149,6 +195,7 @@ void lobby::decideArrange(int a, int b, int c){
     }
     if(client_id == 1) play_id = b;
     if(client_id == 2) play_id = c;
+    gamewindow->setWindowTitle(QString('A'+client_id) + QString(" : ") + QString::number(play_id));
 }
 
 
@@ -184,9 +231,11 @@ void lobby::on_connect_clicked(){
     {
         QObject::connect(listenSocket,SIGNAL(newConnection()),this,SLOT(acceptConnectionHost()));
         ui->logshow->appendPlainText("欢迎加入房间，玩家A");
+        setWindowTitle("A");
         client_id = 0;
     } else if(listenSocket->listen(QHostAddress("127.0.0.1"),6002)) {
         ui->logshow->appendPlainText("欢迎加入房间，玩家B");
+        setWindowTitle("B");
         QObject::connect(listenSocket,SIGNAL(newConnection()),this,SLOT(acceptConnectionMedia()));
 
 
@@ -197,6 +246,7 @@ void lobby::on_connect_clicked(){
         client_id = 1;
     } else {
         ui->logshow->appendPlainText("欢迎加入房间，玩家C");
+        setWindowTitle("C");
         connectSocket_a->connectToHost(QHostAddress("127.0.0.1"),6001);
         connectABC[0] = connectSocket_a;
         QObject::connect(connectSocket_a,SIGNAL(readyRead()),mapper,SLOT(map()));
@@ -216,29 +266,101 @@ void lobby::on_connect_clicked(){
 
 void lobby::sendMessageById(int id,QString m)
 {
+    QString info;
+    info.fill('/',100);
+    info.push_front(m);
+    info = info.left(100);
     QByteArray *array = new QByteArray;
     array->clear();
-    array->append(m);
+    array->append(info);
     connectId[id]->write(array->data());
 }
 
 void lobby::sendMessageByABC(int id,QString m)
 {
+    QString info;
+    info.fill('/',100);
+    info.push_front(m);
+    info = info.left(100);
     QByteArray *array = new QByteArray;
     array->clear();
-    array->append(m);
+    array->append(info);
     connectABC[id]->write(array->data());
 }
 
-void lobby::receiveMessage(int from) {
-    /*
-    QString Info;
+void lobby::receiveMessage(int from) {  // 0A 1B 2B 3C
+    QTcpSocket* message;
     switch (from) {
-    case 0:Info += connectSocket_a->readAll();ui->logShow->append("A说: " + Info);break;
-    case 1:Info += connectSocket_b->readAll();ui->logShow->append("B说: "+ Info);break;
-    case 2:Info += readWriteSocket_b->readAll();ui->logShow->append("B说: "+ Info);break;
-    case 3:Info += readWriteSocket_c->readAll();ui->logShow->append("C说: "+ Info);break;
-    default:break;
+    case 0:{
+        message = connectSocket_a;break;
     }
-    */
+    case 1:{
+        message = connectSocket_b;break;
+    }
+    case 2:{
+        message = readWriteSocket_b;break;
+    }
+    case 3:{
+        message = readWriteSocket_c;break;
+    }
+    }
+    while(message->bytesAvailable()){
+        QString info = message->read(100);
+        qDebug() << "Receive Message: "<< info;
+        QTextStream in(&info);
+        int header;
+        in >> header;
+        qDebug() << header;
+        switch(header){
+        case WAITFORSTART:playersReady();break;
+        case STARTUP:gameStart();break;
+        case ARRANGE:{
+            int a,b,c;
+            in >> a >> b >> c;
+            qDebug() << a << b << c;
+            decideArrange(a,b,c);
+            break;
+        }
+        case SERVE:{
+            int id,ca;
+            char c,space;
+            in >> id;
+            if(id == client_id){
+                for(int i = 0;i<17;i++){
+                    in >> space >> c >> ca;
+                    Poker newcard = Poker(QString(c) + QString::number(ca));
+                    gamewindow->getCard(newcard);
+                }
+                gamewindow->showCard();
+            }
+            break;
+        }
+        case ASKFORLORD:{
+            int ask_id;
+            in >> ask_id;
+            if(ask_id == play_id){
+                whetherLord();
+            }
+            break;
+        }
+        case WANTLORD:{
+            int want,id;
+            in >> id >> want;
+            chooseLord(id,want);
+            break;
+        }
+        case LORDCARDS:{
+            int lordid;
+            in >> lordid;
+            whosLord(lordid);
+            break;
+        }
+        case GAMESTART:
+        case GAMEEND:
+        case REPLAY:
+        default:break;
+        }
+    }
+
+
 }

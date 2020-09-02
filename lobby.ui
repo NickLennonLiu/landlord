@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>685</width>
-    <height>527</height>
+    <width>310</width>
+    <height>348</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,21 +16,17 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <widget class="QPlainTextEdit" name="plainTextEdit_3"/>
-      </item>
-     </layout>
+     <layout class="QHBoxLayout" name="horizontalLayout_4"/>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
-      </item>
-      <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QPlainTextEdit" name="logshow">
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -63,16 +59,9 @@
        <layout class="QVBoxLayout" name="verticalLayout_3"/>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QPlainTextEdit" name="plainTextEdit"/>
-        </item>
-       </layout>
+       <layout class="QVBoxLayout" name="verticalLayout_2"/>
       </item>
      </layout>
-    </item>
-    <item>
-     <widget class="QPlainTextEdit" name="plainTextEdit_4"/>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5"/>
@@ -84,7 +73,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>685</width>
+     <width>310</width>
      <height>26</height>
     </rect>
    </property>
