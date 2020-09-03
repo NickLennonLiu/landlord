@@ -74,6 +74,7 @@ public slots:
     void passSlot(int playid,int last_played);
 
     void gameEnd(int winner);
+    void replaySlot();
 
 public:
     lobby(QWidget *parent = nullptr);
@@ -100,8 +101,9 @@ private:
     int connection;
     int client_id,
         play_id,
-        lord_id
-    , last_played;
+        lord_id;
+    int wantreplay;
+    int last_played;
     int current_stage;
     QList<Poker> lordshand;
 };

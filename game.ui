@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>875</width>
+    <width>1028</width>
     <height>678</height>
    </rect>
   </property>
@@ -82,6 +82,9 @@
             </item>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_12">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QLabel" name="label_2">
                 <property name="text">
@@ -99,6 +102,28 @@
                   <width>0</width>
                   <height>50</height>
                  </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="uLord">
+                <property name="font">
+                 <font>
+                  <family>SimSun-ExtB</family>
+                  <pointsize>14</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -194,6 +219,22 @@
                   <height>50</height>
                  </size>
                 </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lLord">
+                <property name="font">
+                 <font>
+                  <family>SimSun-ExtB</family>
+                  <pointsize>14</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
                </widget>
               </item>
               <item>
@@ -275,7 +316,7 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string> </string>
+                 <string/>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -296,9 +337,25 @@
                <widget class="QLCDNumber" name="sNum">
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>100</width>
                   <height>50</height>
                  </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="sLord">
+                <property name="font">
+                 <font>
+                  <family>SimSun-ExtB</family>
+                  <pointsize>14</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
@@ -323,7 +380,7 @@
                <widget class="QWidget" name="handArea" native="true">
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>800</width>
                   <height>180</height>
                  </size>
                 </property>

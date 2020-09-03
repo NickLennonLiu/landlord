@@ -44,6 +44,7 @@ public:
 
     void showlord(int);
     void showCard();
+    void showlorddecision(int id,bool want);
 
     void playStart(int id);
 

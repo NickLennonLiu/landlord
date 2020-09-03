@@ -2,9 +2,9 @@
 #include "ui_game.h"
 
 bool cmp(const Poker& card1,const Poker& card2){
-    if(card1.getRank()>=card2.getRank() ) return true;
-    if(card1.getRank()<card2.getRank()) return false;
-    return card1.getSuit()>= card2.getSuit();
+    if(card1.getRank()<=card2.getRank() ) return true;
+    if(card1.getRank()>card2.getRank()) return false;
+    return card1.getSuit()<= card2.getSuit();
 }
 game::game(QWidget *parent) :
     QWidget(parent),
@@ -73,6 +73,7 @@ void game::playCard(){
 
 void game::receiveCombo(QList<Poker> cs,int len){
     int pos = 0;
+    for(auto &i:ui->central->children()) delete i;
     for(auto i: cs){
         card* c = new card(i,ui->central);
         c->move(QPoint(10,10)+QPoint((pos%10) * 40,pos/10 * 80));
@@ -100,7 +101,11 @@ void game::getCard(Poker card){
 
 void game::playStart(int id){
     ui->log->setPlainText("游戏开始!请地主开始出牌");
+    ui->sLord->clear();
+    ui->uLord->clear();
+    ui->lLord->clear();
     if(play_id==id){
+        ui->log->setPlainText("轮到你出牌了！");
         ui->confirm->setEnabled(true);
     }
 }
@@ -235,4 +240,16 @@ void game::myTurn(bool canpass){
     if(!canpass) lastcomb = new NotACombo();
     ui->confirm->setEnabled(true);
     ui->log->setPlainText("轮到你出牌了！");
+}
+
+void game::showlorddecision(int id, bool want){
+    if(id == play_id){
+        ui->sLord->setText((want)?"叫地主":"不叫");
+    }
+    if(id == (play_id+1)%3){
+        ui->lLord->setText((want)?"叫地主":"不叫");
+    }
+    if(id == (play_id+2)%3){
+        ui->uLord->setText((want)?"叫地主":"不叫");
+    }
 }
