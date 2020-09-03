@@ -13,6 +13,32 @@ lobby::lobby(QWidget *parent)
     setWindowTitle("Game Lobby");
     gamewindow = new game(this);
     gamewindow->setWindowFlag(Qt::Window);
+    connect(gamewindow,SIGNAL(sendCombo(QList<Poker>,int,int)),this,SLOT(sendComboSlot(QList<Poker>,int,int)));
+    connect(gamewindow,SIGNAL(passSignal(int,int)),this,SLOT(passSlot(int,int)));
+    connect(gamewindow,SIGNAL(gameEnd(int)),this,SLOT(gameEnd(int)));
+}
+
+void lobby::sendComboSlot(QList<Poker> cb,int len,int left){
+    QString info;
+    info += "11 " + QString::number(play_id) + " "
+            + QString::number(left) + " "
+            + QString::number(len) + " ";
+    for(auto i : cb){
+        info += i.string() + " ";
+    }
+    for(int i = 0;i<3;i++){
+        if(i!=play_id) sendMessageById(i,info);
+    }
+}
+
+void lobby::passSlot(int playid,int last_played)
+{
+    QString info;
+    info += "12 " + QString::number(play_id)
+            + " " + QString::number(last_played);
+    for(int i = 0;i<3;i++){
+        if(i!=play_id) sendMessageById(i,info);
+    }
 }
 
 lobby::~lobby()
@@ -150,6 +176,11 @@ void lobby::whosLord(int lordid){
         for(int i = 0;i<3;i++) info += lordshand[i].string() + " ";
         sendMessageByABC(1,info);
         sendMessageByABC(2,info);
+        for(int i = 0;i<3;i++){
+            gamewindow->getlordcard(lordshand[i],i);
+            if(play_id==lordid) gamewindow->getCard(lordshand[i]);
+        }
+        gamewindow->showCard();
     }
     lord_id = lordid;
     gamewindow->showlord(lord_id);
@@ -193,8 +224,14 @@ void lobby::decideArrange(int a, int b, int c){
         sendMessageByABC(1,info);
         sendMessageByABC(2,info);
     }
-    if(client_id == 1) play_id = b;
-    if(client_id == 2) play_id = c;
+    if(client_id == 1) {
+        play_id = b;
+
+    }
+    if(client_id == 2) {
+        play_id = c;
+    }
+    gamewindow->setArrange(client_id,play_id,a,b,c);
     gamewindow->setWindowTitle(QString('A'+client_id) + QString(" : ") + QString::number(play_id));
 }
 
@@ -262,6 +299,15 @@ void lobby::on_connect_clicked(){
     mapper->setMapping(connectSocket_b,1);
     QObject::connect(mapper,SIGNAL(mapped(int)),this,SLOT(receiveMessage(int)));
     ui->connect->setDisabled(true);
+}
+
+void lobby::playStart(){
+    if(client_id==0){
+        QString info("8");
+        sendMessageByABC(1,info);
+        sendMessageByABC(2,info);
+    }
+    gamewindow->playStart(lord_id);
 }
 
 void lobby::sendMessageById(int id,QString m)
@@ -353,14 +399,51 @@ void lobby::receiveMessage(int from) {  // 0A 1B 2B 3C
             int lordid;
             in >> lordid;
             whosLord(lordid);
+            char space,c;
+            int ca;
+            for(int i = 0;i<3;i++){
+                in >> space >> c >> ca;
+                Poker newcard = Poker(QString(c) + QString::number(ca));
+                gamewindow->getlordcard(newcard,i);
+                if(play_id==lordid) gamewindow->getCard(newcard);
+            }
+            if(play_id==lordid) gamewindow->showCard();
             break;
         }
-        case GAMESTART:
-        case GAMEEND:
-        case REPLAY:
+        case GAMESTART: playStart();break;
+        case GAMEEND:break;
+        case REPLAY:break;
+        case COMBO:{
+            int playedid, left, len;
+            in >> playedid >> left >> len;
+            QList<Poker> co;
+            for(int i = 0;i<len;i++){
+                char space,c;
+                int ca;
+                in >> space >> c >> ca;
+                Poker newcard = Poker(QString(c) + QString::number(ca));
+                co.append(newcard);
+
+            }
+            gamewindow->receiveCombo(co,len);
+            gamewindow->updateHandNum(playedid,left);
+            gamewindow->setLastPlayed(playedid);
+            if(left==0) gameEnd(playedid);
+            else if((playedid+1)%3==play_id) gamewindow->myTurn(true);
+            break;
+        }
+        case PASS:{
+            int passid,lastplayed;
+            in >> passid >> lastplayed;
+            gamewindow->setLastPlayed(lastplayed);
+            if((passid+1)%3==play_id) gamewindow->myTurn((lastplayed!=play_id));
+            break;
+        }
         default:break;
         }
     }
+}
 
-
+void lobby::gameEnd(int winner){
+    QMessageBox::information(this,"游戏结束！",((winner==lord_id)? "胜利方：地主":"胜利方：农民"));
 }

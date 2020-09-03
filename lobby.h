@@ -23,6 +23,8 @@
 #define GAMESTART 8
 #define GAMEEND 9
 #define REPLAY 10
+#define COMBO 11
+#define PASS 12
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class lobby; }
@@ -60,12 +62,18 @@ public slots:
     void on_connect_clicked();
 
     void gameStart();
+    void playStart();
 
     void askForLord(int);      // A 询问谁想抢地主
     void whosLord(int);        // A 告知谁是Lord ABC显示谁是LORD，卡牌是什么
 
     bool whetherLord();     // 决定是否叫地主
     void chooseLord(int id,bool yes);    // A 接收来自 BC的抢地主信息
+
+    void sendComboSlot(QList<Poker>,int,int);
+    void passSlot(int playid,int last_played);
+
+    void gameEnd(int winner);
 
 public:
     lobby(QWidget *parent = nullptr);
@@ -80,10 +88,6 @@ private:
     void decideArrange(int a,int b,int c);
     void serve();
 
-
-
-    void playStart();
-
     Ui::lobby *ui;
     game* gamewindow;
     QTcpServer* listenSocket;
@@ -96,7 +100,8 @@ private:
     int connection;
     int client_id,
         play_id,
-        lord_id;
+        lord_id
+    , last_played;
     int current_stage;
     QList<Poker> lordshand;
 };

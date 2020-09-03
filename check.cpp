@@ -36,7 +36,8 @@ Combo& whatCombo(Poker* cards, int len){
         }
     }   
     if(rankBucket[13]&&rankBucket[14]) pairs[pair_cnt++]=Poker(13,joker);
-
+    if(rankBucket[13]&&(!rankBucket[14])) sings[sing_cnt++] = Poker(13,joker);
+    if((!rankBucket[13])&&rankBucket[14]) sings[sing_cnt++] = Poker(14,joker);
     // 单张、对子、三条 排序，为单顺、连对、飞机判断做准备
     sort(sings,sings+(sing_cnt));
     sort(pairs,pairs+(pair_cnt));
@@ -46,6 +47,7 @@ Combo& whatCombo(Poker* cards, int len){
     //单张
     if((sing_cnt==1) && (!pair_cnt) && (!trip_cnt) && (!quart_cnt))
     {
+
         return *(new Single(sings[0]));
     }
     //一对

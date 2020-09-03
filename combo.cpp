@@ -15,6 +15,7 @@ bool Combo::canBeCompared(const Combo& b) const{
 }
 
 bool Combo::biggerSuit(const Combo& b) const{
+    if(b._catog == notacombo) return true;
     return (_catog >= bomb && _catog > b._catog);
 }
 
