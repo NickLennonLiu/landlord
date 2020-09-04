@@ -37,7 +37,6 @@ class game : public QWidget
 
 public:
     explicit game(QWidget *parent = nullptr);
-    bool asklord();
 
     void getCard(Poker);
     void getlordcard(Poker,int);
@@ -52,6 +51,9 @@ public:
     void setLastPlayed(int lastplayed);
     void updateHandNum(int id,int leftnum);
     void myTurn(bool canpass);
+    void showLordQuestion();
+    void End(bool winner);
+    void playerPassed(int);
     ~game();
 
 public slots:
@@ -59,11 +61,18 @@ public slots:
     void receiveCombo(QList<Poker>,int);
     void playCard();
     void pass();
+    void hideLordQuestion();
+    void hideReplay();
 
 signals:
     void sendCombo(QList<Poker>,int,int);
     void passSignal(int,int);
     void gameEnd(int);
+    void wantLord();
+    void noLord();
+    void replaySignal();
+    void closegame();
+
 
 private:
     //void paintEvent(QPaintEvent *event) override;

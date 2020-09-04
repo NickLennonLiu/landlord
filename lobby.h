@@ -67,7 +67,7 @@ public slots:
     void askForLord(int);      // A 询问谁想抢地主
     void whosLord(int);        // A 告知谁是Lord ABC显示谁是LORD，卡牌是什么
 
-    bool whetherLord();     // 决定是否叫地主
+    void whetherLord(bool want);     // 决定是否叫地主
     void chooseLord(int id,bool yes);    // A 接收来自 BC的抢地主信息
 
     void sendComboSlot(QList<Poker>,int,int);
@@ -75,6 +75,8 @@ public slots:
 
     void gameEnd(int winner);
     void replaySlot();
+    void wantLordSlot();
+    void noLordSlot();
 
 public:
     lobby(QWidget *parent = nullptr);

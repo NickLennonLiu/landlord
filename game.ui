@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1028</width>
+    <width>1053</width>
     <height>678</height>
    </rect>
   </property>
@@ -37,7 +37,49 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_11">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10"/>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="exit">
+              <property name="text">
+               <string>退出游戏</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="replay">
+              <property name="text">
+               <string>再玩一次</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="wantLord">
+              <property name="text">
+               <string>叫</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="noLord">
+              <property name="text">
+               <string>不叫</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -456,5 +498,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>exit</sender>
+   <signal>clicked()</signal>
+   <receiver>game</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>688</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>526</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

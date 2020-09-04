@@ -14,9 +14,14 @@ game::game(QWidget *parent) :
     memset(selection,0,sizeof(selection));
     ui->setupUi(this);
     cardselect = new QSignalMapper;
+    ui->wantLord->hide();
+    ui->noLord->hide();
+    ui->replay->hide();
+    ui->exit->hide();
     connect(cardselect,SIGNAL(mapped(int)),this,SLOT(cardSelectSlot(int)));
     connect(ui->confirm,SIGNAL(clicked()),this,SLOT(playCard()));
     connect(ui->pass,SIGNAL(clicked()),this,SLOT(pass()));
+    connect(ui->exit,SIGNAL(clicked()),this,SIGNAL(closegame()));
     ui->sNum->display(17);
     ui->lNum->display(17);
     ui->uNum->display(17);
@@ -26,6 +31,11 @@ void game::setLastPlayed(int lastplayed){
     last_played = lastplayed;
 }
 
+void game::playerPassed(int passid){
+    if(passid == ((play_id+1)%3)) ui->uLord->setText("不出");
+    else ui->lLord->setText("不出");
+}
+
 void game::pass(){
     ui->log->clear();
     ui->confirm->setEnabled(false);
@@ -33,16 +43,30 @@ void game::pass(){
     emit passSignal(play_id,last_played);
 }
 
+void game::showLordQuestion(){
+    ui->wantLord->show();
+    ui->noLord->show();
+    ui->log->setPlainText("是否叫地主？");
+    connect(ui->wantLord,SIGNAL(clicked()),this,SIGNAL(wantLord()));
+    connect(ui->noLord,SIGNAL(clicked()),this,SIGNAL(noLord()));
+    connect(ui->wantLord,SIGNAL(clicked()),this,SLOT(hideLordQuestion()));
+    connect(ui->noLord,SIGNAL(clicked()),this,SLOT(hideLordQuestion()));
+}
+
+void game::hideLordQuestion(){
+    ui->wantLord->hide();
+    ui->noLord->hide();
+    ui->log->clear();
+}
+
 // 由confirm按钮触发
 void game::playCard(){
-    //ui->log->setPlainText("轮到你出牌了");
     Poker chu[20];
     int len = 0;
     //for(int i = 0;i<hand.size();i++) qDebug() << "输出hand内容" << hand[i].string();
     for(int i = 0;i<20;i++){
         if(selection[i]){
             chu[len++] = hand[i];
-            qDebug() << "手牌选择" <<hand[i].string();
         }
     }
     Combo &comb  = whatCombo(chu,len);
@@ -64,11 +88,21 @@ void game::playCard(){
         updateHandNum(play_id,hand.size());
         if(!hand.size()) emit gameEnd(play_id);
     } else {
-        ui->log->setPlainText("你出的牌不合法！ " + QString::number(comb.getCat()) + QString::number(lastcomb->getCat())+QString::number(canBeNext(comb,*lastcomb)));
-        //ui->log->appendPlainText(QString::number(comb.greaterThan(*lastcomb)));
-        //Poker card = comb.getCards(),card2 = lastcomb->getCards();
-        //qDebug() << card.string() << card2.string();
+        ui->log->setPlainText("你出的牌不合法！ ");
     }
+}
+
+void game::End(bool winner){
+    if(winner) ui->log->setPlainText("你赢了！要再玩一次吗？");
+    else ui->log->setPlainText("你输了！要再玩一次吗？");
+    ui->replay->show();
+    ui->exit->show();
+    connect(ui->replay,SIGNAL(clicked()),this,SIGNAL(replaySignal()));
+    connect(ui->replay,SIGNAL(clicked()),this,SLOT(hideReplay()));
+}
+
+void game::hideReplay(){
+    ui->replay->hide();
 }
 
 void game::receiveCombo(QList<Poker> cs,int len){
@@ -83,10 +117,24 @@ void game::receiveCombo(QList<Poker> cs,int len){
     Poker co[20];
     for(int i = 0;i<len;i++) {
         co[i] = cs[i];
-        qDebug() << co[i].string();
     }
     lastcomb = &whatCombo(co,len);
-    //qDebug() << "收到的牌"<< lastcomb->getCat() <<lastcomb->getCards().string();
+    QString info;
+    switch(lastcomb->getCat()){
+    case single:info += "单张！";break;
+    case pair:info += "对子！";break;
+    case triple:info+= "三带！";break;
+    case straight:info+="顺子！";break;
+    case dstraight:info+="连对！";break;
+    case quartwdoub:info+="四带二！";break;
+    case plane:info+="飞机！！";break;
+    case bomb:info+="炸弹！！！";break;
+    case jokers:info+="王炸！！！！";break;
+    default:break;
+    }
+    ui->log->setPlainText(info);
+    ui->uLord->clear();
+    ui->lLord->clear();
 }
 
 game::~game()
@@ -113,26 +161,17 @@ void game::playStart(int id){
 void game::getlordcard(Poker ca, int id)
 {
     card *lordcard = new card(ca,ui->lord);
-    qDebug() << "add lord card " << id;
     lordcard->setDisabled(true);
     QPalette pa = lordcard->palette();
     pa.setCurrentColorGroup(QPalette::Normal);
     lordcard->setPalette(pa);
-    qDebug() << lordcard->palette().currentColorGroup();
     lordcard->setFixedSize(60,80);
     lordcard->setIconSize(lordcard->rect().size());
     lordcard->show();
     lordcard->move(ui->lord->pos()+QPoint(id*70,0));
 }
 
-bool game::asklord(){
-    if(QMessageBox::question(this,"是否抢地主？","请选择是否抢地主")==QMessageBox::Yes){
-        return true;
-    } else return false;
-}
-
 void game::showlord(int lord){
-    //QMessageBox::information(this,"地主是谁？",QString("玩家") + QString('A'+lord)+QString("成为了地主"));
     if(lord == play_id){
         ui->sIdentity->setText("地主");
         ui->lIdentity->setText("农民");
@@ -166,7 +205,6 @@ void game::showCard(){
         connect(c,SIGNAL(cardSelected()),cardselect,SLOT(map()));
         cardselect->setMapping(c,pos);
         cards.append(c);
-        qDebug() << "add new card" << i.string();
         c->move(pos * 40,30);
         c->show();
         pos++;
@@ -215,7 +253,6 @@ void card::selfSelected(){
         move(pos() + QPoint(0,20));
     }
     selected = !selected;
-    qDebug() << c.string() << selected;
     emit cardSelected();
 }
 

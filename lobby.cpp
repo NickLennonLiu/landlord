@@ -12,7 +12,8 @@ lobby::lobby(QWidget *parent)
     ui->replay->setHidden(true);
     ui->connect->setDisabled(false);
     setWindowTitle("Game Lobby");
-    connect(ui->replay,SIGNAL(clicked()),this,SLOT(replaySlot()));
+    gamewindow = new game();
+    //connect(ui->replay,SIGNAL(clicked()),this,SLOT(replaySlot()));
 }
 
 void lobby::sendComboSlot(QList<Poker> cb,int len,int left){
@@ -70,11 +71,16 @@ void lobby::acceptConnectionHost() {
 
 void lobby::gameStart(){
     ui->start->setEnabled(false);
+    gamewindow->close();
     gamewindow = new game(this);
     gamewindow->setWindowFlag(Qt::Window);
     connect(gamewindow,SIGNAL(sendCombo(QList<Poker>,int,int)),this,SLOT(sendComboSlot(QList<Poker>,int,int)));
     connect(gamewindow,SIGNAL(passSignal(int,int)),this,SLOT(passSlot(int,int)));
     connect(gamewindow,SIGNAL(gameEnd(int)),this,SLOT(gameEnd(int)));
+    connect(gamewindow,SIGNAL(wantLord()),this,SLOT(wantLordSlot()));
+    connect(gamewindow,SIGNAL(noLord()),this,SLOT(noLordSlot()));
+    connect(gamewindow,SIGNAL(replaySignal()),this,SLOT(replaySlot()));
+    connect(gamewindow,SIGNAL(closegame()),this,SLOT(close()));
     if(client_id==0){
         //通知BC设置gamewindow
         sendMessageByABC(1,"2");
@@ -152,8 +158,7 @@ void lobby::serve(){
 // A发出 询问是否抢地主
 void lobby::askForLord(int i){
     if(i==play_id){
-        if(whetherLord()) lord_id = i;
-        emit lordProgressSignal();
+        gamewindow->showLordQuestion();
     } else {
         QString info = "5 ";
         info += QString::number(i);
@@ -189,30 +194,38 @@ void lobby::whosLord(int lordid){
     gamewindow->showlord(lord_id);
 }
 
-bool lobby::whetherLord(){
+void lobby::wantLordSlot(){
+    whetherLord(true);
+}
+
+void lobby::noLordSlot(){
+    whetherLord(false);
+}
+
+// 作出叫不叫地主的决定并广播
+void lobby::whetherLord(bool want){
     if(client_id==0){
-        if(gamewindow->asklord()){
+        if(want){
             sendMessageByABC(1,"6 " + QString::number(play_id) + "1");
             sendMessageByABC(2,"6 " + QString::number(play_id) + "1");
             gamewindow->showlorddecision(play_id,true);
-            return true;
+            chooseLord(play_id,true);
         }
         else {
             sendMessageByABC(1,"6 " + QString::number(play_id) + "0");
             sendMessageByABC(2,"6 " + QString::number(play_id) + "0");
             gamewindow->showlorddecision(play_id,false);
-            return false;
+            chooseLord(play_id,false);
         }
 
     } else {
-        if(gamewindow->asklord()){
+        if(want){
             QString info = "6 ";
             info += QString::number(play_id) + " 1";
             sendMessageByABC(0,info);
             sendMessageByABC((client_id==1)?2:1,info);
             qDebug() << "I'm deciding: " << info;
             gamewindow->showlorddecision(play_id,true);
-            return true;
         }
         else {
             QString info = "6 ";
@@ -221,11 +234,10 @@ bool lobby::whetherLord(){
             sendMessageByABC((client_id==1)?2:1,info);
             qDebug() << "I'm deciding: " << info;
             gamewindow->showlorddecision(play_id,false);
-            return false;
         }
     }
-    return false;
 }
+
 
 void lobby::decideArrange(int a, int b, int c){
     connectId[a] = connectABC[0];
@@ -401,7 +413,7 @@ void lobby::receiveMessage(int from) {  // 0A 1B 2B 3C
             int ask_id;
             in >> ask_id;
             if(ask_id == play_id){
-                whetherLord();
+                gamewindow->showLordQuestion();
             }
             break;
         }
@@ -461,6 +473,7 @@ void lobby::receiveMessage(int from) {  // 0A 1B 2B 3C
             int passid,lastplayed;
             in >> passid >> lastplayed;
             gamewindow->setLastPlayed(lastplayed);
+            gamewindow->playerPassed(passid);
             if((passid+1)%3==play_id) gamewindow->myTurn((lastplayed!=play_id));
             break;
         }
@@ -470,12 +483,7 @@ void lobby::receiveMessage(int from) {  // 0A 1B 2B 3C
 }
 
 void lobby::gameEnd(int winner){
-    if(QMessageBox::information(this,"游戏结束！",((winner==lord_id)? "胜利方：地主":"胜利方：农民"))){
-        gamewindow->close();
-        ui->logshow->appendPlainText("再玩一次？");
-        ui->replay->show();
-        ui->replay->setEnabled(true);
-    }
+    gamewindow->End(!((winner==lord_id)^(play_id==lord_id)));
 }
 
 void lobby::replaySlot(){
@@ -489,5 +497,5 @@ void lobby::replaySlot(){
         info += "10";
         sendMessageByABC(0,info);
     }
-    ui->replay->setEnabled(false);
+   // ui->replay->setEnabled(false);
 }
