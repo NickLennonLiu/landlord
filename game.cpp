@@ -14,6 +14,8 @@ game::game(QWidget *parent) :
     memset(selection,0,sizeof(selection));
     ui->setupUi(this);
     cardselect = new QSignalMapper;
+    ui->confirm->hide();
+    ui->pass->hide();
     ui->wantLord->hide();
     ui->noLord->hide();
     ui->replay->hide();
@@ -33,13 +35,14 @@ void game::setLastPlayed(int lastplayed){
 
 void game::playerPassed(int passid){
     if(passid == ((play_id+1)%3)) ui->uLord->setText("不出");
+    if(passid==play_id) ui->sLord->setText("不出");
     else ui->lLord->setText("不出");
 }
 
 void game::pass(){
     ui->log->clear();
-    ui->confirm->setEnabled(false);
-    ui->pass->setEnabled(false);
+    ui->confirm->hide();
+    ui->pass->hide();
     emit passSignal(play_id,last_played);
 }
 
@@ -83,8 +86,8 @@ void game::playCard(){
         emit sendCombo(chucard,len,hand.size());
         receiveCombo(chucard,len);
         ui->log->clear();
-        ui->confirm->setEnabled(false);
-        ui->pass->setEnabled(false);
+        ui->confirm->hide();
+        ui->pass->hide();
         updateHandNum(play_id,hand.size());
         if(!hand.size()) emit gameEnd(play_id);
     } else {
@@ -135,6 +138,7 @@ void game::receiveCombo(QList<Poker> cs,int len){
     ui->log->setPlainText(info);
     ui->uLord->clear();
     ui->lLord->clear();
+    ui->sLord->clear();
 }
 
 game::~game()
@@ -154,7 +158,7 @@ void game::playStart(int id){
     ui->lLord->clear();
     if(play_id==id){
         ui->log->setPlainText("轮到你出牌了！");
-        ui->confirm->setEnabled(true);
+        ui->confirm->show();
     }
 }
 
@@ -273,9 +277,9 @@ void game::updateHandNum(int id, int leftnum){
 }
 
 void game::myTurn(bool canpass){
-    if(canpass) ui->pass->setEnabled(true);
+    if(canpass) ui->pass->show();
     if(!canpass) lastcomb = new NotACombo();
-    ui->confirm->setEnabled(true);
+    ui->confirm->show();
     ui->log->setPlainText("轮到你出牌了！");
 }
 
