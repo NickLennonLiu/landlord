@@ -35,7 +35,7 @@ void game::setLastPlayed(int lastplayed){
 
 void game::playerPassed(int passid){
     if(passid == ((play_id+1)%3)) ui->uLord->setText("不出");
-    if(passid==play_id) ui->sLord->setText("不出");
+    else if(passid==play_id) ui->sLord->setText("不出");
     else ui->lLord->setText("不出");
 }
 

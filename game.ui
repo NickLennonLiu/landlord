@@ -52,6 +52,19 @@
              </spacer>
             </item>
             <item>
+             <widget class="QPushButton" name="pushButton">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>给助教倒一杯卡布奇诺</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="exit">
               <property name="text">
                <string>退出游戏</string>
@@ -455,7 +468,7 @@
               <item>
                <widget class="QPushButton" name="confirm">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="maximumSize">
                  <size>
@@ -471,7 +484,7 @@
               <item>
                <widget class="QPushButton" name="pass">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="maximumSize">
                  <size>
