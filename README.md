@@ -2,7 +2,7 @@
 
 <h1><center>“网络斗地主”程序设计文档</center></h1>
 
-<p align="right">计95 刘玉河 2019011560</p>
+<p align="right">Junetheriver</p>
 ## 主要类
 
 | 类                         | 作用                                       |
